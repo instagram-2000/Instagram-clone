@@ -5,7 +5,17 @@ import styles from '../styles/Home.module.css'
 export default function Home() {
   return (
     <>
-    <h1 className=""> Welcome to The instagram Project</h1>
+
+
+      <Head>
+        <title>Login ▫ Instagram</title>
+        <meta name="description" content="Edited and modified by vaibhav And nagesh " />
+        <link rel="icon" href="/insta.ico" />
+      </Head>
+
+      <h1 className="heading">Welcome to Instagram clone</h1>
     </>
+
+
   )
 }
