@@ -3,7 +3,13 @@ import Image from "next/image";
 import styles from "../styles/Home.module.css";
 import { useRouter } from "next/router";
 import Link from "next/link";
-import { HomeIcon, ChatIcon } from "@heroicons/react/solid";
+import {
+  HomeIcon,
+  ChatIcon,
+  PlusCircleIcon,
+  TemplateIcon,
+  HeartIcon,
+} from "@heroicons/react/outline";
 import ProfileDropdown from "./Profile/ProfileDropdown";
 export default function Home() {
   const router = useRouter();
@@ -21,11 +27,14 @@ export default function Home() {
         />
         <link rel="icon" href="/insta.ico" />
       </Head>
-      <div className="flex flex-row">
-        <div>
-          <img src="https://i.imgur.com/zqpwkLQ.png" />
+      <div className="flex flex-row justify-center mt-5 h-16">
+        <div className="flex flex-row justify-self-start">
+          <div className="basis-1/2 mt-3 ">
+            <img src="https://i.imgur.com/zqpwkLQ.png" />
+          </div>
+          <div></div>
         </div>
-        <div>
+        <div className="justify-self-end">
           <div class="max-w-md mx-auto">
             <div class="relative flex items-center w-full h-12 rounded-lg focus-within:shadow-lg bg-white overflow-hidden">
               <div class="grid place-items-center h-full w-12 text-gray-300">
@@ -54,14 +63,25 @@ export default function Home() {
             </div>
           </div>
         </div>
-        <div>
-          <HomeIcon className="h-5 w-5 text-blue-500" />
-        </div>
-        <div>
-          <ChatIcon className="h-5 w-5 text-blue-500" />
-        </div>
-        <div>
-          <ProfileDropdown />
+        <div className="flex flex-row px-2 py-3 ">
+          <div>
+            <HomeIcon className="h-8 w-8" />
+          </div>
+          <div>
+            <ChatIcon className="h-8 w-8" />
+          </div>
+          <div>
+            <PlusCircleIcon className="h-8 w-8" />
+          </div>
+          <div>
+            <TemplateIcon className="h-8 w-8" />
+          </div>
+          <div>
+            <HeartIcon className="h-8 w-8" />
+          </div>
+          <div>
+            <ProfileDropdown />
+          </div>
         </div>
       </div>
       {/* <div className="flex justify-center items-center my-40 text-4xl">

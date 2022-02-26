@@ -7,7 +7,7 @@ import {
   BookmarkIcon,
   CogIcon,
   SwitchHorizontalIcon,
-} from "@heroicons/react/solid";
+} from "@heroicons/react/outline";
 
 export default function ProfileDropdown() {
   return (
