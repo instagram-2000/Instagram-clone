@@ -2,9 +2,12 @@ import Head from 'next/head'
 import Image from 'next/image'
 import styles from '../styles/Home.module.css'
 import { useRouter } from 'next/router'
+import Link from 'next/link'
 export default function Home() {
   const router = useRouter()
-
+  const loginhandelr= () =>{
+    router.push('/Login')
+  }
   return (
     <>
    
@@ -14,12 +17,7 @@ export default function Home() {
         <link rel="icon" href="/insta.ico" />
       </Head>
       
-      Click me
-   
-      <div className="login">first div</div>
-      <div className="signup">Sign up</div>
-      <div className="download">Get app</div>
-      <div className="footer">Footer</div>
+     <div className="flex justify-center items-center my-40 text-4xl"><Link href='/Login'><h1 className="cursor-pointer text-blue-600 ">Login page touch me</h1></Link></div>
     
     </>
 
