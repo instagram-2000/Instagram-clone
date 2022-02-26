@@ -13,9 +13,9 @@ export default function Home() {
         <meta name="description" content="Edited and modified by vaibhav And nagesh " />
         <link rel="icon" href="/insta.ico" />
       </Head>
-      <button type="button" onClick={() => router.push('/Login')}>
+      
       Click me
-    </button> 
+   
       <div className="login">first div</div>
       <div className="signup">Sign up</div>
       <div className="download">Get app</div>
