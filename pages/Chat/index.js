@@ -13,8 +13,8 @@ const Chat = () => {
       <link rel="icon" href="/insta.ico" />
     </Head>
     <Mainnavigation />
-    <div className="w-full h-[600px] bg-blue-300 pt-2">
-      <div className="border-gray container border mx-auto my-4 w-[930px] grid grid-cols-3  h-auto rounded">
+    <div className="w-full h-[600px] bg-cyan-100 pt-1">
+      <div className="border-gray container border mx-auto my-4 w-[930px] grid grid-cols-3 grid-row-3 h-auto rounded">
 
 
         <div className="border-gray border-b h-14 flex justify-center items-center bg-white ">
@@ -60,7 +60,17 @@ const Chat = () => {
           <ChatProfiledata />
           <ChatProfiledata />
           <ChatProfiledata />
-
+          <ChatProfiledata />
+          <ChatProfiledata />
+          <ChatProfiledata />
+          <ChatProfiledata />
+          <ChatProfiledata />
+          <ChatProfiledata />
+          <ChatProfiledata />
+          <ChatProfiledata />
+          <ChatProfiledata />
+          <ChatProfiledata />
+          <ChatProfiledata />
           <ChatProfiledata />
           <ChatProfiledata />
           <ChatProfiledata />
@@ -68,16 +78,30 @@ const Chat = () => {
 
 
         </div>
-        <div className="col-span-2 border-l border-gray h-[500px]  bg-white">
-          
+        <div className="col-span-2 border-l border-gray h-[500px] flex flex-col-reverse  bg-white ">
+          <div className=" ">
+            <div className="flex justify-center items-center text-xs">Today 8:33 PM</div>
+            <div className="flex flex-row"><div className="massages  h-8 rounded-full my-5  mr-4 pr-4 py-1 bg-cyan-100 ml-4 pl-4 ">Congrates page are ready to show</div></div>
+            <div className="flex flex-row-reverse"><div className="massages  h-8 rounded-full my-5  mr-4 pr-4 py-1 bg-cyan-100 ml-4 pl-4 ">Ohh Well Done!!</div></div>
 
 
-
-
-
+            <div className="rounded-full  border flex  h-10 mb-2  w-[600px] mx-2 bg-blue">
+              <div className="emoji text-4xl flex ">☺</div>
+              <input className='mx-2' type="text" placeholder='Message...'/>
+              <div className="flex space-x-2 ml-52 justify-center">
+                <div className="media">Media</div>
+              <div className="like">heart</div>
+              </div>
+            </div>
+          </div>
 
         </div>
-     </div>
+
+
+
+
+
+      </div>
     </div>
   </>
   )

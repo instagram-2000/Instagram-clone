@@ -44,7 +44,7 @@ const Mainnavigation = () => {
           </div>
         </div>
       </div>
-      <div className="flex flex-row flex-initial px-2 mt-5 space-x-4 ml-12 ">
+      <div className="flex flex-row flex-initial px-2 mt-5 space-x-4 ml-20 ">
         <div>
           <HomeIcon className="h-7 w-7" />
         </div>
