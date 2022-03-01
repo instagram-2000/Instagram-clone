@@ -12,13 +12,13 @@ import ProfileDropdown from "E:/React apps learning/Programming Notes/Next j/Com
 
 const Mainnavigation = () => {
   return (
-    <div className="flex flex-row   h-[65px] border-b mb-0 ">
+    <div className="flex flex-row fixed top-0 left-0 right-0 bg-white  h-[65px] border-b mb-0 ">
       <div className="flex-none mr-28 ml-44 py-2">
           <img className='h-8 my-3 ml-10 contrast-200' src="https://i.imgur.com/zqpwkLQ.png" />
       </div>
-      <div className="flex-initial  border bg-slate-200 h-[35px] my-4 ml-28 w-64 rounded-lg ">
+      <div className="flex-initial  border bg-cyan-100 h-[35px] my-4 ml-28 w-64 rounded-lg ">
         <div className="max-w-md mx-auto ">
-          <div className="relative flex  bg-slate-200 items-center h-6 rounded-lg focus-within:shadow-lg bg-white overflow-hidden">
+          <div className="relative flex  bg-cyan-100 items-center h-6 rounded-lg focus-within:shadow-lg  overflow-hidden">
             <div className="grid place-items-center  w-12 text-black mt-2">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -37,7 +37,7 @@ const Mainnavigation = () => {
             </div>
 
             <input
-              className=" bg-slate-200 justify-center mt-2"
+              className=" bg-cyan-100 justify-center mt-2"
               type="text"
               id="search"
               placeholder="Search "

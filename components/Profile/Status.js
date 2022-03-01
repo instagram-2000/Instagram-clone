@@ -3,7 +3,7 @@ import React from 'react'
 const Status = () => {
   return (
    <div className='flex flex-col '>
-    <div className="border flex justify-center items-center px-1 h-20 w-20 rounded-full">
+    <div className="border-2 border-red-700 flex justify-center items-center px-0.5 h-16 w-16 rounded-full">
     <img
               src="https://mdbcdn.b-cdn.net/img/new/avatars/2.webp"
               className="rounded-full  "

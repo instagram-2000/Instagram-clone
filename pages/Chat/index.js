@@ -13,15 +13,15 @@ const Chat = () => {
       <link rel="icon" href="/insta.ico" />
     </Head>
     <Mainnavigation />
-    <div className="w-full h-[600px] bg-cyan-100 pt-1">
+    <div className="w-full h-[600px] mt-14 bg-gray-50 pt-1">
       <div className="border-gray container border mx-auto my-4 w-[930px] grid grid-cols-3 grid-row-3 h-auto rounded">
 
 
         <div className="border-gray border-b h-14 flex justify-center items-center bg-white ">
           <span className='font-bold'>Mohanalkarvaibhav ▼</span>
           <span className=''>
-            
-            </span>
+
+          </span>
 
         </div>
 
@@ -62,19 +62,7 @@ const Chat = () => {
           <ChatProfiledata />
           <ChatProfiledata />
           <ChatProfiledata />
-          <ChatProfiledata />
-          <ChatProfiledata />
-          <ChatProfiledata />
-          <ChatProfiledata />
-          <ChatProfiledata />
-          <ChatProfiledata />
-          <ChatProfiledata />
-          <ChatProfiledata />
-          <ChatProfiledata />
-          <ChatProfiledata />
-          <ChatProfiledata />
-          <ChatProfiledata />
-          <ChatProfiledata />
+
 
 
 
@@ -88,10 +76,10 @@ const Chat = () => {
 
             <div className="rounded-full  border flex  h-10 mb-2  w-[600px] mx-2 bg-blue">
               <div className="emoji text-4xl flex ">☺</div>
-              <input className='mx-2' type="text" placeholder='Message...'/>
+              <input className='mx-2' type="text" placeholder='Message...' />
               <div className="flex space-x-2 ml-52 justify-center">
                 <div className="media">Media</div>
-              <div className="like">heart</div>
+                <div className="like">heart</div>
               </div>
             </div>
           </div>

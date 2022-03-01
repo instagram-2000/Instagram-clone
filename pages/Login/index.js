@@ -10,12 +10,12 @@ const Login = () => {
         <link rel="icon" href="/insta.ico" />
       </Head>
 
-      <div className="flex flex-col  ">
+      <div className="flex flex-col  bg-gray-50">
         <div className=""></div>
 
 
 
-        <div className="border border-gray-200 mx-auto mt-8 w-[350px]  h-[380px] ">
+        <div className="border rounded bg-white border-gray-200 mx-auto mt-8 w-[350px]  h-[380px] ">
 
 
           <div className="flex justify-center my-8">
@@ -26,8 +26,8 @@ const Login = () => {
 
 
           <div className="flex flex-col">
-            <input className="my-1 border mx-10 h-9 rounded border-gray-300" type="text" placeholder='Phone number , Username, or email address'></input>
-            <input className="my-1 border mx-10 h-9 rounded border-gray-300" type="password" placeholder='Password'></input>
+            <input className="my-1 bg-gray-50 border mx-10 h-9 rounded border-gray-300" type="text" placeholder='Phone number , Username, or email address'></input>
+            <input className="my-1 bg-gray-50 border mx-10 h-9 rounded border-gray-300" type="password" placeholder='Password'></input>
             <button className='border w-[270px] mx-auto h-8 rounded text-center text-white bg-blue-200 mt-2 font-bold'> Log In</button>
           </div>
 
@@ -59,7 +59,7 @@ const Login = () => {
 
 
 
-        <div className="border border-gray-200 mx-auto mt-3 w-[350px]  h-[65px] flex justify-center space-x-1">
+        <div className="border bg-white border-gray-200 mx-auto mt-3 w-[350px]  h-[65px] flex justify-center space-x-1">
         <span className='text-sm  mt-5'>Dont have an Account? </span>
         <span className='text-sm  mt-5 font-bold text-blue-500'> Sign up </span>
           </div>
@@ -99,24 +99,24 @@ const Login = () => {
 
 
 
-       <div className="flex flex-wrap mt-14 mx-10">
-         <ul className='flex flex-wrap space-x-4 justify-center text-xs text-black space-y-2'>
-           <li></li>
-           <li> Meta </li>
-           <li> About </li>
-           <li> Blog </li>
-           <li> Jobs </li>
-           <li> Help </li>
-           <li> API </li>
-           <li> Privacy </li>
-           <li> Terms </li>
-           <li> top Accounts </li>
-           <li> Hashtag </li>
-           <li> Location </li>
-           <li> Instagram lite </li>
+              <div className="flex flex-wrap mt-14 mx-auto">
+          <ul className='flex flex-wrap space-x-4 justify-center text-xs text-black space-y-2'>
+            <li></li>
+            <li> Meta </li>
+            <li> About </li>
+            <li> Blog </li>
+            <li> Jobs </li>
+            <li> Help </li>
+            <li> API </li>
+            <li> Privacy </li>
+            <li> Terms </li>
+            <li> top Accounts </li>
+            <li> Hashtag </li>
+            <li> Location </li>
+            <li> Instagram lite </li>
 
-         </ul>
-         </div>
+          </ul>
+        </div>
 
       <div className="flex flex-row justify-center text-xs mt-7 mb-14 space-x-4" >
       <span>English (UK)  &#709;</span>
