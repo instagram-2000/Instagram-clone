@@ -1,0 +1,42 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Keep this list in sync with VITE_SUPERADMIN_EMAILS in .env — this is
+    // the real enforcement point, the env var is a client-side UI hint only.
+    function isSuperAdminEmail() {
+      return request.auth != null &&
+        request.auth.token.email in [
+          'vaibhavvakil1234@gmail.com'
+          // add more superadmin emails here, one per line
+        ];
+    }
+
+    // Defense in depth: also honor a Firestore-recorded SUPERADMIN role, so
+    // a superadmin added after go-live doesn't require a rules redeploy.
+    function isSuperAdminDoc() {
+      return request.auth != null &&
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'SUPERADMIN';
+    }
+
+    function isSuperAdmin() {
+      return isSuperAdminEmail() || isSuperAdminDoc();
+    }
+
+    match /hospitals/{slug} {
+      allow read: if true; // public tenant landing pages read without auth
+      allow create, update, delete: if isSuperAdmin();
+    }
+
+    match /users/{uid} {
+      allow get: if request.auth != null && (request.auth.uid == uid || isSuperAdmin());
+      allow list: if isSuperAdmin();
+      allow create, update, delete: if isSuperAdmin();
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

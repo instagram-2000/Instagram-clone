@@ -104,4 +104,57 @@ export const dummyHospitals = {
       email: 'hello@citycarehospital.example',
     },
   },
+
+  talehospital: {
+    title: 'Tale Hospital',
+    branding: {
+      logos: {
+        bgImage: 'https://picsum.photos/seed/tale-hospital/1600/900',
+        smallLogo: 'https://picsum.photos/seed/tale-logo/100/100',
+      },
+      primaryColor: '#7c3aed',
+      secondColor: '#1e1b4b',
+    },
+    optionals: {
+      services: {
+        enabled: 'on',
+        orderNumber: 1,
+        items: [
+          { title: 'Maternity Care', description: 'Prenatal to postnatal support.', icon: '🤱' },
+          { title: 'Radiology', description: 'CT, MRI and X-ray imaging.', icon: '📷' },
+          { title: 'ICU', description: '24/7 critical care unit.', icon: '🏥' },
+        ],
+      },
+      departments: {
+        enabled: 'on',
+        orderNumber: 2,
+        items: [
+          { name: 'Gynecology', description: 'Women\'s health and maternity.' },
+          { name: 'Urology', description: 'Kidney and urinary tract care.' },
+          { name: 'Oncology', description: 'Cancer diagnosis and treatment.' },
+        ],
+      },
+      doctors: {
+        enabled: 'on',
+        orderNumber: 3,
+        items: [
+          { name: 'Dr. Neha Kulkarni', specialization: 'Gynecologist', photo: 'https://i.pravatar.cc/150?u=neha-kulkarni' },
+          { name: 'Dr. Arjun Verma', specialization: 'Oncologist', photo: 'https://i.pravatar.cc/150?u=arjun-verma' },
+        ],
+      },
+      testimonials: {
+        enabled: 'on',
+        orderNumber: 4,
+        items: [
+          { name: 'Divya Menon', message: 'Compassionate staff and clean facilities.', rating: 5 },
+          { name: 'Rohit Bansal', message: 'Great maternity care experience.', rating: 5 },
+        ],
+      },
+    },
+    footer: {
+      address: '12 Tale Street, Mumbai, MH',
+      phone: '+91 90123 45678',
+      email: 'contact@talehospital.example',
+    },
+  },
 }

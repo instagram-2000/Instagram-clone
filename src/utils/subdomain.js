@@ -1,5 +1,20 @@
 const ROOT_HOSTNAMES = new Set(['localhost', '127.0.0.1'])
 
+// VITE_APP_BASE_URL is the app's own deployed origin (e.g. a *.vercel.app
+// URL). Vercel's default domain already has 3+ dot-separated parts
+// (foo.vercel.app), which would otherwise be mistaken for a tenant
+// subdomain by the parts.length >= 3 check below, so it must be
+// recognized as root explicitly.
+const APP_BASE_HOSTNAME = (() => {
+  const baseUrl = import.meta.env.VITE_APP_BASE_URL
+  if (!baseUrl) return ''
+  try {
+    return new URL(baseUrl).hostname.toLowerCase()
+  } catch {
+    return ''
+  }
+})()
+
 /**
  * Resolves the tenant slug from the current URL.
  *
@@ -9,6 +24,7 @@ const ROOT_HOSTNAMES = new Set(['localhost', '127.0.0.1'])
  *   abc.xyz.com         -> "abc"  (hospital tenant)
  *   localhost           -> null   (root, for local dev)
  *   abc.localhost        -> "abc"  (hospital tenant, for local dev)
+ *   foo.vercel.app       -> null   (root, when VITE_APP_BASE_URL is foo.vercel.app)
  *
  * A `?tenant=abc` query param always wins, so a tenant site can be
  * previewed on plain `localhost` without configuring hosts/DNS.
@@ -20,6 +36,7 @@ export function getTenantSlug(location = window.location) {
   const hostname = location.hostname.toLowerCase()
 
   if (ROOT_HOSTNAMES.has(hostname)) return null
+  if (APP_BASE_HOSTNAME && hostname === APP_BASE_HOSTNAME) return null
 
   const parts = hostname.split('.')
 
