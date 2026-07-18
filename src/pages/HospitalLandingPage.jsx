@@ -1,6 +1,5 @@
-import { useEffect } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { fetchHospitalConfig } from '../redux/slices/hospitalSlice'
+import { useEffect, useState } from 'react'
+import { subscribeHospital } from '../firebase/hospitals'
 import Spinner from '../components/common/Spinner'
 import TenantNotFound from './TenantNotFound'
 import Header from '../components/hospital/Header'
@@ -9,19 +8,19 @@ import SectionRenderer from '../components/hospital/SectionRenderer'
 import Footer from '../components/hospital/Footer'
 
 function HospitalLandingPage({ slug }) {
-  const dispatch = useDispatch()
-  const { config, status } = useSelector((state) => state.hospital)
+  const [config, setConfig] = useState(undefined)
 
-  useEffect(() => {
-    dispatch(fetchHospitalConfig(slug))
-  }, [dispatch, slug])
+  // Live listener, not a one-time cached fetch — a superadmin change (e.g.
+  // toggling a content section on) shows up here immediately, including in
+  // tabs already open, instead of waiting out a stale local cache.
+  useEffect(() => subscribeHospital(slug, setConfig), [slug])
 
   useEffect(() => {
     if (config?.title) document.title = config.title
   }, [config?.title])
 
-  if (status === 'loading' || status === 'idle') return <Spinner />
-  if (status === 'failed' || !config) return <TenantNotFound slug={slug} />
+  if (config === undefined) return <Spinner />
+  if (!config) return <TenantNotFound slug={slug} />
 
   return (
     <div

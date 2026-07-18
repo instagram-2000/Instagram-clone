@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Navigate, useLocation } from 'react-router-dom'
 import { signIn, signOutUser } from '../../firebase/auth'
-import { resolveHospitalConfig } from '../../utils/hospitalConfig'
+import { subscribeHospital } from '../../firebase/hospitals'
 import { useAuth } from '../../contexts/AuthContext'
 import { ROLES } from '../../utils/roles'
 import Spinner from '../../components/common/Spinner'
@@ -17,9 +17,10 @@ function HospitalLoginPage({ tenantSlug }) {
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
 
-  useEffect(() => {
-    resolveHospitalConfig(tenantSlug).then((config) => setHospitalTitle(config?.title || ''))
-  }, [tenantSlug])
+  useEffect(
+    () => subscribeHospital(tenantSlug, (config) => setHospitalTitle(config?.title || '')),
+    [tenantSlug]
+  )
 
   if (loading) return <Spinner />
 

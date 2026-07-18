@@ -1,5 +1,10 @@
+import { Link, useLocation } from 'react-router-dom'
+import { useLanguage } from '../../contexts/LanguageContext'
+
 function Footer({ config }) {
   const { title, footer } = config
+  const location = useLocation()
+  const { t } = useLanguage()
 
   return (
     <footer
@@ -18,7 +23,10 @@ function Footer({ config }) {
         </div>
       </div>
       <p className="mt-6 text-center text-xs text-slate-400">
-        © {new Date().getFullYear()} {title}. All rights reserved.
+        © {new Date().getFullYear()} {title}. {t('hospital.allRightsReserved')} &middot;{' '}
+        <Link to={{ pathname: '/appointment-status', search: location.search }} className="hover:text-slate-200">
+          {t('hospital.checkAppointmentStatus')}
+        </Link>
       </p>
     </footer>
   )

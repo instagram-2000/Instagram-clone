@@ -19,7 +19,9 @@ function DoctorOverviewPage({ tenantSlug }) {
 
   useEffect(() => subscribeAppointments(tenantSlug, setAppointments), [tenantSlug])
 
-  const mine = appointments.filter((a) => a.doctorId === user.uid)
+  // Doctors only ever see confirmed appointments — pending (unconfirmed by
+  // reception) ones are invisible to them by design.
+  const mine = appointments.filter((a) => a.doctorId === user.uid && a.status !== 'pending')
   const today = todayString()
   const todaysAppointments = mine.filter((a) => a.date === today)
   const upcoming = mine.filter((a) => a.date > today && a.status === 'scheduled')

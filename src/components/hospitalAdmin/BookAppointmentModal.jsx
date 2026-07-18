@@ -39,10 +39,6 @@ function BookAppointmentModal({ hospitalId, patients, doctors, preselectedPatien
     e.preventDefault()
     setError('')
 
-    if (!doctorId) {
-      setError('Add a doctor before booking appointments.')
-      return
-    }
     if (isNewPatient && !newPatientName.trim()) {
       setError('Patient name is required.')
       return
@@ -75,11 +71,14 @@ function BookAppointmentModal({ hospitalId, patients, doctors, preselectedPatien
           patientId: finalPatientId,
           patientName,
           patientPhone,
-          doctorId,
+          doctorId: doctorId || null,
           doctorName: selectedDoctor?.displayName || '',
           date,
           time,
           notes: notes.trim(),
+          // No doctor picked yet — goes to Pending so reception assigns one
+          // (and records payment) at confirmation, same as a patient booking.
+          status: doctorId ? 'scheduled' : 'pending',
         },
         user.uid
       )
@@ -153,7 +152,7 @@ function BookAppointmentModal({ hospitalId, patients, doctors, preselectedPatien
               onChange={(e) => setDoctorId(e.target.value)}
               className={`${inputClass} cursor-pointer`}
             >
-              {doctors.length === 0 && <option value="">No doctors yet</option>}
+              <option value="">No preference — reception will assign</option>
               {doctors.map((d) => (
                 <option key={d.uid} value={d.uid}>
                   {d.displayName} {d.specialization ? `— ${d.specialization}` : ''}

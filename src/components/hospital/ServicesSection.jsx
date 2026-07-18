@@ -1,10 +1,13 @@
+import { useLanguage } from '../../contexts/LanguageContext'
+
 function ServicesSection({ data }) {
   const items = data?.items ?? []
+  const { t } = useLanguage()
   if (items.length === 0) return null
 
   return (
     <section className="px-6 py-16 md:px-12">
-      <h2 className="text-center text-2xl font-semibold text-slate-800">Our Services</h2>
+      <h2 className="text-center text-2xl font-semibold text-slate-800">{t('hospital.ourServices')}</h2>
       <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {items.map((item) => (
           <div

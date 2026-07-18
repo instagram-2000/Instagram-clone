@@ -11,6 +11,8 @@ import DashboardPage from './pages/superadmin/DashboardPage'
 import HospitalsListPage from './pages/superadmin/HospitalsListPage'
 import HospitalFormPage from './pages/superadmin/HospitalFormPage'
 import HospitalDetailPage from './pages/superadmin/HospitalDetailPage'
+import PublicAppointmentPage from './pages/PublicAppointmentPage'
+import AppointmentStatusPage from './pages/AppointmentStatusPage'
 import RequireHospitalStaff from './components/hospitalAdmin/RequireHospitalStaff'
 import RequireRole from './components/hospitalAdmin/RequireRole'
 import HospitalPortalLayout from './components/hospitalAdmin/HospitalPortalLayout'
@@ -56,6 +58,14 @@ function App() {
           </Route>
           <Route path="*" element={<Navigate to="/superadmin" replace />} />
         </Route>
+      )}
+
+      {/* Public, no-login booking + status pages — only on a hospital's own subdomain. */}
+      {tenantSlug && (
+        <>
+          <Route path="/appointment" element={<PublicAppointmentPage slug={tenantSlug} />} />
+          <Route path="/appointment-status" element={<AppointmentStatusPage slug={tenantSlug} />} />
+        </>
       )}
 
       {/* /login and /dashboard only exist on a hospital's own subdomain —

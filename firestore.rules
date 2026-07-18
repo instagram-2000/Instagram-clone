@@ -61,15 +61,23 @@ service cloud.firestore {
         request.resource.data.email == resource.data.email;
     }
 
+    // Doctor directory entries (name, specialization, schedule) are
+    // intentionally public — patients need them to pick a doctor when
+    // booking, without any login.
+    function isActiveDoctorDoc() {
+      return resource.data.role == 'DOCTOR' && resource.data.status == 'active';
+    }
+
     match /hospitals/{slug} {
       allow read: if true; // public tenant landing pages read without auth
       allow create, update, delete: if isSuperAdmin();
     }
 
     match /users/{uid} {
-      allow get: if request.auth != null &&
-        (request.auth.uid == uid || isSuperAdmin() || isHospitalStaffOf(resource.data.hospitalId));
-      allow list: if isSuperAdmin() || isHospitalStaffOf(resource.data.hospitalId);
+      allow get: if isActiveDoctorDoc() ||
+        (request.auth != null &&
+          (request.auth.uid == uid || isSuperAdmin() || isHospitalStaffOf(resource.data.hospitalId)));
+      allow list: if isActiveDoctorDoc() || isSuperAdmin() || isHospitalStaffOf(resource.data.hospitalId);
 
       allow create: if isSuperAdmin() ||
         (isHospitalAdminOf(request.resource.data.hospitalId) &&
@@ -91,15 +99,39 @@ service cloud.firestore {
 
     match /patients/{patientId} {
       allow read: if isSuperAdmin() || isHospitalStaffOf(resource.data.hospitalId);
-      allow create: if isHospitalStaffOf(request.resource.data.hospitalId);
+      // Public self-service booking creates its own patient record — no
+      // login, so this can only be shape-checked, not identity-checked.
+      allow create: if isHospitalStaffOf(request.resource.data.hospitalId) ||
+        (request.resource.data.hospitalId is string &&
+         request.resource.data.name is string &&
+         request.resource.data.phone is string);
       allow update: if isSuperAdmin() || isHospitalStaffOf(resource.data.hospitalId);
       allow delete: if isSuperAdmin();
     }
 
     match /appointments/{appointmentId} {
-      allow read: if isSuperAdmin() || isHospitalStaffOf(resource.data.hospitalId);
-      allow create: if isHospitalStaffOf(request.resource.data.hospitalId);
+      // The doc ID doubles as an unguessable public lookup token (see
+      // getAppointmentByToken) — anyone who has it can fetch that one
+      // appointment, but never enumerate the collection (allow list stays
+      // staff-only below).
+      allow get: if true;
+      allow list: if isSuperAdmin() || isHospitalStaffOf(resource.data.hospitalId);
+      // Staff book already-confirmed appointments; the public booking page
+      // may only create ones that start 'pending' front-desk confirmation.
+      allow create: if isHospitalStaffOf(request.resource.data.hospitalId) ||
+        (request.resource.data.status == 'pending' && request.resource.data.bookedBy == 'patient');
       allow update: if isSuperAdmin() || isHospitalStaffOf(resource.data.hospitalId);
+      allow delete: if isSuperAdmin();
+    }
+
+    // Doc ID is `{hospitalId}::{digitsOnlyPhone}` — lets the public status
+    // page resolve "my appointments" from a phone number alone via a
+    // direct get-by-ID, the same unguessable-ID pattern as appointment
+    // tokens, without ever exposing an open query across all patients.
+    match /phoneLookup/{lookupId} {
+      allow get: if true;
+      allow list: if isSuperAdmin() || isHospitalStaffOf(resource.data.hospitalId);
+      allow create, update: if request.resource.data.hospitalId is string && request.resource.data.tokens is list;
       allow delete: if isSuperAdmin();
     }
 

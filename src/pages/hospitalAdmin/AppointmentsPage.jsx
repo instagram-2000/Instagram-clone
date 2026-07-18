@@ -5,22 +5,33 @@ import { subscribeUsersByHospital } from '../../firebase/users'
 import { useAuth } from '../../contexts/AuthContext'
 import { ROLES } from '../../utils/roles'
 import BookAppointmentModal from '../../components/hospitalAdmin/BookAppointmentModal'
+import ConfirmPaymentModal from '../../components/hospitalAdmin/ConfirmPaymentModal'
 import Spinner from '../../components/common/Spinner'
 
 const STATUS_STYLES = {
+  pending: 'bg-amber-50 text-amber-700 ring-amber-200',
   scheduled: 'bg-sky-50 text-sky-700 ring-sky-200',
   completed: 'bg-emerald-50 text-emerald-700 ring-emerald-200',
   cancelled: 'bg-slate-100 text-slate-500 ring-slate-200',
 }
 
+const STATUS_LABELS = {
+  pending: 'Pending confirmation',
+  scheduled: 'Confirmed',
+  completed: 'Completed',
+  cancelled: 'Cancelled',
+}
+
+const PAYMENT_LABELS = { cash: 'Cash', online: 'Online' }
+
 function AppointmentStatusBadge({ status }) {
   return (
     <span
-      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium capitalize ring-1 ring-inset ${
+      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ring-1 ring-inset ${
         STATUS_STYLES[status] || STATUS_STYLES.scheduled
       }`}
     >
-      {status}
+      {STATUS_LABELS[status] || status}
     </span>
   )
 }
@@ -29,12 +40,14 @@ function AppointmentsPage({ tenantSlug }) {
   const { role, user } = useAuth()
   const isDoctor = role === ROLES.DOCTOR
   const canBook = role === ROLES.HOSPITAL_ADMIN || role === ROLES.RECEPTIONIST
+  const canConfirm = canBook
 
   const [appointments, setAppointments] = useState(null)
   const [patients, setPatients] = useState([])
   const [staff, setStaff] = useState([])
   const [search, setSearch] = useState('')
   const [showBookModal, setShowBookModal] = useState(false)
+  const [confirmingAppointment, setConfirmingAppointment] = useState(null)
 
   useEffect(() => subscribeAppointments(tenantSlug, setAppointments), [tenantSlug])
   useEffect(() => subscribePatients(tenantSlug, setPatients), [tenantSlug])
@@ -44,7 +57,9 @@ function AppointmentsPage({ tenantSlug }) {
 
   const visible = useMemo(() => {
     if (!appointments) return []
-    let list = isDoctor ? appointments.filter((a) => a.doctorId === user.uid) : appointments
+    let list = isDoctor
+      ? appointments.filter((a) => a.doctorId === user.uid && a.status !== 'pending')
+      : appointments
     const q = search.trim().toLowerCase()
     if (q) {
       list = list.filter(
@@ -87,6 +102,7 @@ function AppointmentsPage({ tenantSlug }) {
               <th className="px-4 py-3">Patient</th>
               {!isDoctor && <th className="px-4 py-3">Doctor</th>}
               <th className="px-4 py-3">Status</th>
+              {!isDoctor && <th className="px-4 py-3">Payment</th>}
               <th className="px-4 py-3" />
             </tr>
           </thead>
@@ -101,11 +117,24 @@ function AppointmentsPage({ tenantSlug }) {
                     <span className="block text-xs font-normal text-slate-400">{appt.patientPhone}</span>
                   )}
                 </td>
-                {!isDoctor && <td className="px-4 py-3 text-slate-500">{appt.doctorName}</td>}
+                {!isDoctor && (
+                  <td className="px-4 py-3 text-slate-500">{appt.doctorName || 'Unassigned'}</td>
+                )}
                 <td className="px-4 py-3">
                   <AppointmentStatusBadge status={appt.status} />
                 </td>
+                {!isDoctor && (
+                  <td className="px-4 py-3 text-slate-500">{PAYMENT_LABELS[appt.paymentMethod] || '—'}</td>
+                )}
                 <td className="px-4 py-3 text-right">
+                  {appt.status === 'pending' && canConfirm && (
+                    <button
+                      onClick={() => setConfirmingAppointment(appt)}
+                      className="cursor-pointer text-sm font-medium text-slate-900 hover:underline"
+                    >
+                      Confirm
+                    </button>
+                  )}
                   {appt.status === 'scheduled' && (
                     <>
                       <button
@@ -127,7 +156,7 @@ function AppointmentsPage({ tenantSlug }) {
             ))}
             {visible.length === 0 && (
               <tr>
-                <td colSpan={isDoctor ? 5 : 6} className="px-4 py-8 text-center text-slate-400">
+                <td colSpan={isDoctor ? 5 : 7} className="px-4 py-8 text-center text-slate-400">
                   No appointments found.
                 </td>
               </tr>
@@ -143,6 +172,14 @@ function AppointmentsPage({ tenantSlug }) {
           doctors={doctors}
           onCancel={() => setShowBookModal(false)}
           onCreated={() => setShowBookModal(false)}
+        />
+      )}
+
+      {confirmingAppointment && (
+        <ConfirmPaymentModal
+          appointment={confirmingAppointment}
+          doctors={doctors}
+          onClose={() => setConfirmingAppointment(null)}
         />
       )}
     </div>

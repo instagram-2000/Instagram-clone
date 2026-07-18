@@ -56,6 +56,21 @@ export function subscribeUsersByHospital(hospitalId, callback) {
   })
 }
 
+// Narrower than subscribeUsersByHospital — matches the public Firestore
+// rule that only exposes active doctors (never receptionists/admins) to
+// unauthenticated visitors, for the public booking page's doctor picker.
+export function subscribeActiveDoctors(hospitalId, callback) {
+  const q = query(
+    collection(db, USERS_COLLECTION),
+    where('hospitalId', '==', hospitalId),
+    where('role', '==', ROLES.DOCTOR),
+    where('status', '==', 'active')
+  )
+  return onSnapshot(q, (snapshot) => {
+    callback(snapshot.docs.map((d) => ({ uid: d.id, ...d.data() })))
+  })
+}
+
 export async function getStaffCount() {
   const q = query(collection(db, USERS_COLLECTION), where('role', '!=', ROLES.SUPERADMIN))
   const snapshot = await getCountFromServer(q)

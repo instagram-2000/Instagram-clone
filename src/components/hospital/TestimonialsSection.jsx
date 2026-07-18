@@ -1,11 +1,14 @@
+import { useLanguage } from '../../contexts/LanguageContext'
+
 function TestimonialsSection({ data }) {
   const items = data?.items ?? []
+  const { t } = useLanguage()
   if (items.length === 0) return null
 
   return (
     <section className="bg-slate-50 px-6 py-16 md:px-12">
       <h2 className="text-center text-2xl font-semibold text-slate-800">
-        What Our Patients Say
+        {t('hospital.testimonials')}
       </h2>
       <div className="mt-10 grid grid-cols-1 gap-6 md:grid-cols-3">
         {items.map((item) => (

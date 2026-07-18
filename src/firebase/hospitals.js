@@ -30,21 +30,6 @@ export const DEFAULT_OPTIONALS = {
   testimonials: { enabled: 'off', orderNumber: 4, items: [] },
 }
 
-/**
- * Fetches a single hospital's tenant configuration by its subdomain slug.
- * Returns null if no hospital is configured for that slug.
- */
-export async function fetchHospitalConfigBySlug(slug) {
-  const ref = doc(db, HOSPITALS_COLLECTION, slug)
-  const snapshot = await getDoc(ref)
-
-  if (!snapshot.exists()) {
-    return null
-  }
-
-  return { slug, ...snapshot.data() }
-}
-
 export function isReservedSlug(slug) {
   return RESERVED_SLUGS.has(slug.toLowerCase())
 }

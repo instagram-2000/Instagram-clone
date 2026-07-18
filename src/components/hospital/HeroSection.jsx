@@ -1,6 +1,11 @@
+import { Link, useLocation } from 'react-router-dom'
+import { useLanguage } from '../../contexts/LanguageContext'
+
 function HeroSection({ config }) {
   const { title, branding } = config
   const bgImage = branding?.logos?.bgImage
+  const location = useLocation()
+  const { t } = useLanguage()
 
   return (
     <section
@@ -14,18 +19,16 @@ function HeroSection({ config }) {
     >
       <div className="max-w-2xl text-white">
         <p className="mb-3 text-sm font-medium uppercase tracking-wide text-[var(--tenant-primary)]">
-          Welcome to
+          {t('hospital.welcomeTo')}
         </p>
         <h1 className="text-4xl font-bold leading-tight md:text-5xl">{title}</h1>
-        <p className="mt-4 text-lg text-slate-100/90">
-          Quality healthcare, trusted specialists, and appointments that fit your life.
-        </p>
-        <a
-          href="#contact"
+        <p className="mt-4 text-lg text-slate-100/90">{t('hospital.heroSubtitle')}</p>
+        <Link
+          to={{ pathname: '/appointment', search: location.search }}
           className="mt-8 inline-block rounded-full bg-[var(--tenant-primary)] px-6 py-3 font-medium text-white shadow-lg"
         >
-          Book an Appointment
-        </a>
+          {t('hospital.bookAnAppointment')}
+        </Link>
       </div>
     </section>
   )
