@@ -1,9 +1,6 @@
 import { useEffect } from 'react'
 import NavIcon from './NavIcon'
 
-// Generic backdrop + centered card shell — closes on Escape or a backdrop
-// click, and owns the fade/scale-in so every popup (booking, status check,
-// etc.) opens and closes the same way instead of each screen re-inventing it.
 function Modal({ children, onClose, className = 'max-w-md' }) {
   useEffect(() => {
     function handleKey(e) {
@@ -13,6 +10,12 @@ function Modal({ children, onClose, className = 'max-w-md' }) {
     return () => document.removeEventListener('keydown', handleKey)
   }, [onClose])
 
+  useEffect(() => {
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => { document.body.style.overflow = prev }
+  }, [])
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/60 px-4 py-8 backdrop-blur-sm"
@@ -20,7 +23,7 @@ function Modal({ children, onClose, className = 'max-w-md' }) {
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className={`animate-fade-in-up relative max-h-[85vh] w-full overflow-y-auto rounded-2xl border border-line bg-surface p-5 shadow-xl sm:p-8 ${className}`}
+        className={`animate-fade-in-up relative max-h-[85vh] w-full overflow-y-auto rounded-2xl border border-line/80 bg-surface p-6 shadow-2xl shadow-black/10 ring-1 ring-black/5 sm:p-8 ${className}`}
       >
         <button
           onClick={onClose}

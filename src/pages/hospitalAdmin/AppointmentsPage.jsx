@@ -10,17 +10,18 @@ import BookAppointmentModal from '../../components/hospitalAdmin/BookAppointment
 import ConfirmPaymentModal from '../../components/hospitalAdmin/ConfirmPaymentModal'
 import CompleteVisitModal from '../../components/hospitalAdmin/CompleteVisitModal'
 import RescheduleAppointmentModal from '../../components/hospitalAdmin/RescheduleAppointmentModal'
-import Spinner from '../../components/common/Spinner'
+import { PageSpinner } from '../../components/common/Spinner'
+import NavIcon from '../../components/common/NavIcon'
 
 const STATUS_STYLES = {
-  pending: 'bg-amber-500/10 text-amber-600 ring-amber-500/30 dark:text-amber-400',
-  scheduled: 'bg-sky-500/10 text-sky-600 ring-sky-500/30 dark:text-sky-400',
-  completed: 'bg-emerald-500/10 text-emerald-600 ring-emerald-500/30 dark:text-emerald-400',
+  pending: 'bg-amber-500/10 text-amber-600 ring-amber-500/20 dark:text-amber-400',
+  scheduled: 'bg-sky-500/10 text-sky-600 ring-sky-500/20 dark:text-sky-400',
+  completed: 'bg-emerald-500/10 text-emerald-600 ring-emerald-500/20 dark:text-emerald-400',
   cancelled: 'bg-card-strong text-muted ring-line',
 }
 
 const STATUS_LABELS = {
-  pending: 'Pending confirmation',
+  pending: 'Pending',
   scheduled: 'Confirmed',
   completed: 'Completed',
   cancelled: 'Cancelled',
@@ -31,7 +32,7 @@ const PAYMENT_LABELS = { cash: 'Cash', online: 'Online' }
 function AppointmentStatusBadge({ status }) {
   return (
     <span
-      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ring-1 ring-inset ${
+      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide ring-1 ring-inset ${
         STATUS_STYLES[status] || STATUS_STYLES.scheduled
       }`}
     >
@@ -47,8 +48,6 @@ function AppointmentsPage({ tenantSlug }) {
   const isDoctor = role === ROLES.DOCTOR
   const canBook = role === ROLES.HOSPITAL_ADMIN || role === ROLES.RECEPTIONIST
   const canConfirm = canBook
-  // Notes are clinical — visible to the doctor who wrote them and to the
-  // hospital admin for oversight, but not to reception.
   const canViewNotes = isDoctor || role === ROLES.HOSPITAL_ADMIN
 
   const [appointments, setAppointments] = useState(null)
@@ -67,16 +66,11 @@ function AppointmentsPage({ tenantSlug }) {
   useEffect(() => subscribeUsersByHospital(tenantSlug, setStaff), [tenantSlug])
 
   const doctors = staff.filter((s) => s.role === ROLES.DOCTOR && s.status === 'active')
-  // Keyed by uid regardless of active/disabled status, so a schedule-conflict
-  // check still works even for an appointment whose doctor was since deactivated.
   const doctorsById = useMemo(
     () => Object.fromEntries(staff.filter((s) => s.role === ROLES.DOCTOR).map((d) => [d.uid, d])),
     [staff]
   )
 
-  // A confirmed appointment can go stale if the doctor edits their weekly
-  // schedule afterwards — this flags that mismatch instead of silently
-  // continuing to show "Confirmed" for a slot the doctor no longer works.
   function hasScheduleConflict(appt) {
     if (appt.status !== 'scheduled' || !appt.doctorId || !appt.time) return false
     const doctor = doctorsById[appt.doctorId]
@@ -103,139 +97,165 @@ function AppointmentsPage({ tenantSlug }) {
     return categorizeAppointments(visible)
   }, [visible])
 
-  if (appointments === null) return <Spinner />
+  if (appointments === null) return <PageSpinner />
 
   return (
-    <div>
+    <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <h1 className="text-xl font-semibold text-heading">{isDoctor ? 'My Appointments' : 'Appointments'}</h1>
+        <div>
+          <h1 className="text-xl font-semibold text-heading">{isDoctor ? 'My Appointments' : 'Appointments'}</h1>
+          <p className="mt-0.5 text-sm text-muted">Manage and track patient appointments</p>
+        </div>
         {canBook && (
           <button
             onClick={() => setShowBookModal(true)}
-            className="cursor-pointer rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-indigo-500"
+            className="inline-flex items-center gap-2 cursor-pointer rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm shadow-indigo-500/25 transition-all hover:bg-indigo-500 hover:shadow-md hover:shadow-indigo-500/30 active:scale-[0.98]"
           >
-            + Book Appointment
+            <NavIcon name="appointments" className="h-4 w-4" />
+            Book Appointment
           </button>
         )}
       </div>
 
       <input
         type="text"
-        placeholder="Search by patient name or phone…"
+        placeholder="Search by patient name or phone..."
         value={search}
         onChange={(e) => setSearch(e.target.value)}
-        className="mt-4 w-full max-w-sm rounded-lg border border-line bg-card px-3 py-2 text-sm text-heading placeholder:text-faint focus:border-line-strong focus:outline-none sm:w-72"
+        className="w-full max-w-sm rounded-xl border border-line bg-card px-4 py-2.5 text-sm text-heading placeholder:text-faint focus:border-indigo-500/50 focus:outline-none focus:ring-2 focus:ring-indigo-500/10"
       />
 
-      <div className="mt-4 flex gap-1 rounded-xl bg-card-strong p-1">
+      <div className="flex gap-1 rounded-xl bg-card-strong p-1">
         {TABS.map((tab) => (
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
-            className={`cursor-pointer rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
+            className={`cursor-pointer rounded-lg px-4 py-2 text-sm font-medium transition-all duration-200 ${
               activeTab === tab.key
                 ? 'bg-card text-heading shadow-sm'
                 : 'text-muted hover:text-heading'
             }`}
           >
             {tab.label}
+            {categorized[tab.key]?.length > 0 && (
+              <span className={`ml-1.5 inline-flex h-5 min-w-[20px] items-center justify-center rounded-full px-1 text-[10px] font-bold ${
+                activeTab === tab.key ? 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-300' : 'bg-card-strong text-faint'
+              }`}>
+                {categorized[tab.key].length}
+              </span>
+            )}
           </button>
         ))}
       </div>
 
-      <div className="mt-4 overflow-x-auto rounded-2xl border border-line bg-card">
+      <div className="overflow-x-auto rounded-2xl border border-line bg-card shadow-sm">
         <table className="min-w-full divide-y divide-line text-sm">
-          <thead className="text-left text-xs font-medium uppercase tracking-wide text-faint">
-            <tr>
-              <th className="px-4 py-3">Date</th>
-              <th className="px-4 py-3">Time</th>
-              <th className="px-4 py-3">Patient</th>
-              {!isDoctor && <th className="px-4 py-3">Doctor</th>}
-              <th className="px-4 py-3">Status</th>
-              {!isDoctor && <th className="px-4 py-3">Payment</th>}
-              <th className="px-4 py-3" />
+          <thead>
+            <tr className="border-b border-line bg-card-strong/30">
+              <th className="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-faint">Date</th>
+              <th className="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-faint">Time</th>
+              <th className="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-faint">Patient</th>
+              {!isDoctor && <th className="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-faint">Doctor</th>}
+              <th className="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-faint">Status</th>
+              {!isDoctor && <th className="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-faint">Payment</th>}
+              <th className="px-5 py-3.5 text-right text-xs font-semibold uppercase tracking-wider text-faint">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-line">
             {(categorized[activeTab] || []).map((appt) => (
-              <tr key={appt.id} className="transition-colors hover:bg-card-strong">
-                <td className="px-4 py-3 text-heading">{appt.date}</td>
-                <td className="px-4 py-3 text-muted">{appt.time || '—'}</td>
-                <td className="px-4 py-3 text-heading">
-                  {appt.patientName}
+              <tr key={appt.id} className="group transition-colors hover:bg-card-strong/50">
+                <td className="whitespace-nowrap px-5 py-3.5">
+                  <span className="font-medium text-heading">{appt.date}</span>
+                </td>
+                <td className="whitespace-nowrap px-5 py-3.5 text-muted">{appt.time || '—'}</td>
+                <td className="px-5 py-3.5">
+                  <div className="font-medium text-heading">{appt.patientName}</div>
                   {appt.patientPhone && (
-                    <span className="block text-xs font-normal text-faint">{appt.patientPhone}</span>
+                    <div className="text-xs text-faint">{appt.patientPhone}</div>
                   )}
                 </td>
                 {!isDoctor && (
-                  <td className="px-4 py-3 text-muted">{appt.doctorName || 'Unassigned'}</td>
+                  <td className="px-5 py-3.5 text-muted">{appt.doctorName || 'Unassigned'}</td>
                 )}
-                <td className="px-4 py-3">
-                  <AppointmentStatusBadge status={appt.status} />
-                  {hasScheduleConflict(appt) && (
-                    <span
-                      title="The doctor's schedule no longer covers this time — reschedule it."
-                      className="ml-2 inline-flex items-center rounded-full bg-amber-500/10 px-2 py-0.5 text-xs font-medium text-amber-600 ring-1 ring-amber-500/30 ring-inset dark:text-amber-400"
-                    >
-                      ⚠ Schedule changed
-                    </span>
-                  )}
+                <td className="px-5 py-3.5">
+                  <div className="flex items-center gap-2">
+                    <AppointmentStatusBadge status={appt.status} />
+                    {hasScheduleConflict(appt) && (
+                      <span
+                        title="The doctor's schedule no longer covers this time — reschedule it."
+                        className="inline-flex items-center gap-1 rounded-full bg-amber-500/10 px-2 py-0.5 text-[10px] font-semibold text-amber-600 ring-1 ring-amber-500/20 ring-inset dark:text-amber-400"
+                      >
+                        <NavIcon name="schedule" className="h-3 w-3" />
+                        Conflict
+                      </span>
+                    )}
+                  </div>
                 </td>
                 {!isDoctor && (
-                  <td className="px-4 py-3 text-muted">{PAYMENT_LABELS[appt.paymentMethod] || '—'}</td>
+                  <td className="px-5 py-3.5 text-muted">{PAYMENT_LABELS[appt.paymentMethod] || '—'}</td>
                 )}
-                <td className="px-4 py-3 text-right">
-                  {appt.status === 'pending' && canConfirm && (
-                    <button
-                      onClick={() => setConfirmingAppointment(appt)}
-                      className="cursor-pointer text-sm font-medium text-heading hover:underline"
-                    >
-                      Confirm
-                    </button>
-                  )}
-                  {appt.status === 'scheduled' && (
-                    <>
-                      {canBook && (
+                <td className="px-5 py-3.5 text-right">
+                  <div className="flex items-center justify-end gap-2">
+                    {appt.status === 'pending' && canConfirm && (
+                      <button
+                        onClick={() => setConfirmingAppointment(appt)}
+                        className="cursor-pointer rounded-lg bg-indigo-500/10 px-3 py-1.5 text-xs font-medium text-indigo-600 transition-colors hover:bg-indigo-500/20 dark:text-indigo-300"
+                      >
+                        Confirm
+                      </button>
+                    )}
+                    {appt.status === 'scheduled' && (
+                      <>
+                        {canBook && (
+                          <button
+                            onClick={() => setReschedulingAppt(appt)}
+                            className={`cursor-pointer rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
+                              hasScheduleConflict(appt)
+                                ? 'bg-amber-500/10 text-amber-600 hover:bg-amber-500/20 dark:text-amber-400'
+                                : 'text-muted hover:bg-card-strong hover:text-heading'
+                            }`}
+                          >
+                            Reschedule
+                          </button>
+                        )}
                         <button
-                          onClick={() => setReschedulingAppt(appt)}
-                          className={`mr-4 cursor-pointer text-sm font-medium hover:underline ${
-                            hasScheduleConflict(appt) ? 'text-amber-600 dark:text-amber-400' : 'text-body hover:text-heading'
-                          }`}
+                          onClick={() =>
+                            isDoctor ? setCompletingAppt(appt) : updateAppointmentStatus(appt.id, 'completed')
+                          }
+                          className="cursor-pointer rounded-lg bg-emerald-500/10 px-3 py-1.5 text-xs font-medium text-emerald-600 transition-colors hover:bg-emerald-500/20 dark:text-emerald-400"
                         >
-                          Reschedule
+                          Complete
                         </button>
-                      )}
+                        <button
+                          onClick={() => updateAppointmentStatus(appt.id, 'cancelled')}
+                          className="cursor-pointer rounded-lg px-3 py-1.5 text-xs font-medium text-muted transition-colors hover:bg-red-500/10 hover:text-red-600 dark:hover:text-red-400"
+                        >
+                          Cancel
+                        </button>
+                      </>
+                    )}
+                    {appt.status === 'completed' && canViewNotes && (
                       <button
-                        onClick={() =>
-                          isDoctor ? setCompletingAppt(appt) : updateAppointmentStatus(appt.id, 'completed')
-                        }
-                        className="mr-4 cursor-pointer text-sm font-medium text-emerald-600 hover:text-emerald-500 dark:text-emerald-400"
+                        onClick={() => setViewingAppt(appt)}
+                        className="cursor-pointer rounded-lg px-3 py-1.5 text-xs font-medium text-muted transition-colors hover:bg-card-strong hover:text-heading"
                       >
-                        Mark completed
+                        View notes
                       </button>
-                      <button
-                        onClick={() => updateAppointmentStatus(appt.id, 'cancelled')}
-                        className="cursor-pointer text-sm font-medium text-red-500 hover:text-red-400"
-                      >
-                        Cancel
-                      </button>
-                    </>
-                  )}
-                  {appt.status === 'completed' && canViewNotes && (
-                    <button
-                      onClick={() => setViewingAppt(appt)}
-                      className="cursor-pointer text-sm font-medium text-body hover:text-heading"
-                    >
-                      View notes
-                    </button>
-                  )}
+                    )}
+                  </div>
                 </td>
               </tr>
             ))}
             {(categorized[activeTab] || []).length === 0 && (
               <tr>
-                <td colSpan={isDoctor ? 5 : 7} className="px-4 py-8 text-center text-faint">
-                  No {activeTab} appointments found.
+                <td colSpan={isDoctor ? 5 : 7} className="px-5 py-16 text-center">
+                  <div className="flex flex-col items-center">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-card-strong">
+                      <NavIcon name="appointments" className="h-6 w-6 text-faint" />
+                    </div>
+                    <p className="mt-3 text-sm font-medium text-muted">No {activeTab} appointments</p>
+                    <p className="mt-1 text-xs text-faint">Appointments will appear here once booked</p>
+                  </div>
                 </td>
               </tr>
             )}

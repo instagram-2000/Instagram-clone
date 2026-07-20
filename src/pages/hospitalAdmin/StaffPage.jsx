@@ -10,27 +10,35 @@ import StaffFormModal from "../../components/superadmin/StaffFormModal";
 import CredentialsDialog from "../../components/superadmin/CredentialsDialog";
 import StatusBadge from "../../components/superadmin/StatusBadge";
 import DoctorScheduleEditor from "../../components/hospitalAdmin/DoctorScheduleEditor";
-import Spinner from "../../components/common/Spinner";
+import { PageSpinner } from "../../components/common/Spinner";
 import Modal from "../../components/common/Modal";
+import NavIcon from "../../components/common/NavIcon";
 
 function ConfirmModal({ title, message, confirmLabel, danger, onConfirm, onCancel }) {
   return (
     <Modal onClose={onCancel} className="max-w-sm">
-      <h2 className="text-base font-semibold text-heading">{title}</h2>
-      <p className="mt-2 text-sm text-muted">{message}</p>
-      <div className="mt-5 flex justify-end gap-3">
+      <div className="flex items-center gap-3">
+        <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${
+          danger ? 'bg-red-500/10 ring-1 ring-inset ring-red-500/20' : 'bg-indigo-500/10 ring-1 ring-inset ring-indigo-500/20'
+        }`}>
+          <NavIcon name={danger ? "close" : "check"} className={`h-5 w-5 ${danger ? 'text-red-600 dark:text-red-400' : 'text-indigo-600 dark:text-indigo-300'}`} />
+        </div>
+        <h2 className="text-base font-semibold text-heading">{title}</h2>
+      </div>
+      <p className="mt-3 text-sm text-muted leading-relaxed">{message}</p>
+      <div className="mt-6 flex justify-end gap-3">
         <button
           onClick={onCancel}
-          className="cursor-pointer rounded-lg border border-line px-4 py-2 text-sm font-medium text-body transition-colors hover:bg-card-strong hover:text-heading"
+          className="cursor-pointer rounded-xl border border-line px-4 py-2 text-sm font-medium text-body transition-colors hover:bg-card-strong hover:text-heading"
         >
           Cancel
         </button>
         <button
           onClick={onConfirm}
-          className={`cursor-pointer rounded-lg px-4 py-2 text-sm font-medium text-white transition-colors ${
+          className={`cursor-pointer rounded-xl px-4 py-2 text-sm font-medium text-white transition-all ${
             danger
-              ? "bg-red-600 hover:bg-red-500"
-              : "bg-indigo-600 hover:bg-indigo-500"
+              ? "bg-red-600 hover:bg-red-500 shadow-sm shadow-red-500/25"
+              : "bg-indigo-600 hover:bg-indigo-500 shadow-sm shadow-indigo-500/25"
           }`}
         >
           {confirmLabel}
@@ -47,10 +55,7 @@ function StaffPage({ tenantSlug }) {
   const [scheduleDoctor, setScheduleDoctor] = useState(null);
   const [resetSentFor, setResetSentFor] = useState(null);
   const [showInactive, setShowInactive] = useState(false);
-
-  // confirmation modal state
   const [confirmAction, setConfirmAction] = useState(null);
-  // { type: 'deactivate' | 'reactivate' | 'resetPassword', member: {...} }
 
   async function executeResetPassword(member) {
     setResetSentFor(null);
@@ -75,7 +80,7 @@ function StaffPage({ tenantSlug }) {
 
   useEffect(() => subscribeUsersByHospital(tenantSlug, setStaff), [tenantSlug]);
 
-  if (staff === null) return <Spinner />;
+  if (staff === null) return <PageSpinner />;
 
   const allStaff = staff.filter(
     (s) => s.role === ROLES.DOCTOR || s.role === ROLES.RECEPTIONIST,
@@ -86,106 +91,124 @@ function StaffPage({ tenantSlug }) {
   const visibleStaff = showInactive ? allStaff : activeStaff;
 
   return (
-    <div>
+    <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <h1 className="text-xl font-semibold text-heading">Staff</h1>
+        <div>
+          <h1 className="text-xl font-semibold text-heading">Staff</h1>
+          <p className="mt-0.5 text-sm text-muted">
+            {activeStaff.length} active staff member{activeStaff.length !== 1 ? 's' : ''}
+          </p>
+        </div>
         <button
           onClick={() => setShowAddModal(true)}
-          className="cursor-pointer rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-indigo-500"
+          className="inline-flex items-center gap-2 cursor-pointer rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm shadow-indigo-500/25 transition-all hover:bg-indigo-500 hover:shadow-md hover:shadow-indigo-500/30 active:scale-[0.98]"
         >
-          + Add Staff
+          <NavIcon name="staff" className="h-4 w-4" />
+          Add Staff
         </button>
       </div>
-      <p className="mt-1 text-sm text-muted">
-        Add doctors and receptionists here. Hospital admin accounts can only be
-        created by Currez support.
-      </p>
 
-      {/* filter toggle */}
       {inactiveStaff.length > 0 && (
-        <div className="mt-4">
-          <button
-            onClick={() => setShowInactive(!showInactive)}
-            className="cursor-pointer rounded-lg border border-line px-3.5 py-1.5 text-xs font-medium text-muted transition-colors hover:bg-card-strong hover:text-heading"
-          >
-            {showInactive
-              ? `Showing all ${allStaff.length} staff`
-              : `Show ${inactiveStaff.length} deactivated`}
-          </button>
-        </div>
+        <button
+          onClick={() => setShowInactive(!showInactive)}
+          className="inline-flex items-center gap-1.5 cursor-pointer rounded-xl border border-line px-3.5 py-2 text-xs font-medium text-muted transition-all hover:bg-card-strong hover:text-heading"
+        >
+          <NavIcon name={showInactive ? "eye" : "eyeOff"} className="h-3.5 w-3.5" />
+          {showInactive
+            ? `Showing all ${allStaff.length} staff`
+            : `Show ${inactiveStaff.length} deactivated`}
+        </button>
       )}
 
-      <div className="mt-4 overflow-x-auto rounded-2xl border border-line bg-card">
+      <div className="overflow-x-auto rounded-2xl border border-line bg-card shadow-sm">
         <table className="min-w-full divide-y divide-line text-sm">
-          <thead className="text-left text-xs font-medium uppercase tracking-wide text-faint">
-            <tr>
-              <th className="px-4 py-3">Name</th>
-              <th className="px-4 py-3">Email</th>
-              <th className="px-4 py-3">Role</th>
-              <th className="px-4 py-3">Status</th>
-              <th className="px-4 py-3" />
+          <thead>
+            <tr className="border-b border-line bg-card-strong/30">
+              <th className="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-faint">Name</th>
+              <th className="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-faint">Email</th>
+              <th className="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-faint">Role</th>
+              <th className="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-faint">Status</th>
+              <th className="px-5 py-3.5 text-right text-xs font-semibold uppercase tracking-wider text-faint">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-line">
             {visibleStaff.map((member) => (
               <tr
                 key={member.uid}
-                className={`transition-colors hover:bg-card-strong ${
+                className={`group transition-colors hover:bg-card-strong/50 ${
                   member.status !== "active" ? "opacity-60" : ""
                 }`}
               >
-                <td className="px-4 py-3 font-medium text-heading">
-                  {member.displayName}
-                  {member.role === ROLES.DOCTOR && member.specialization && (
-                    <span className="block text-xs font-normal text-faint">
-                      {member.specialization}
-                    </span>
-                  )}
+                <td className="px-5 py-3.5">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-violet-500/10 text-xs font-bold text-violet-600 ring-1 ring-inset ring-violet-500/20 dark:text-violet-300">
+                      {(member.displayName || '?')[0].toUpperCase()}
+                    </div>
+                    <div>
+                      <span className="font-medium text-heading">{member.displayName}</span>
+                      {member.role === ROLES.DOCTOR && member.specialization && (
+                        <span className="block text-xs text-faint">{member.specialization}</span>
+                      )}
+                    </div>
+                  </div>
                 </td>
-                <td className="px-4 py-3 text-muted">{member.email}</td>
-                <td className="px-4 py-3 text-muted">
-                  {ROLE_LABELS[member.role] || member.role}
+                <td className="px-5 py-3.5 text-muted">{member.email}</td>
+                <td className="px-5 py-3.5">
+                  <span className="inline-flex items-center rounded-lg bg-card-strong px-2.5 py-1 text-xs font-medium text-muted">
+                    {ROLE_LABELS[member.role] || member.role}
+                  </span>
                 </td>
-                <td className="px-4 py-3">
+                <td className="px-5 py-3.5">
                   <StatusBadge status={member.status} kind="user" />
                 </td>
-                <td className="px-4 py-3 text-right">
-                  {member.role === ROLES.DOCTOR && (
+                <td className="px-5 py-3.5 text-right">
+                  <div className="flex items-center justify-end gap-1">
+                    {member.role === ROLES.DOCTOR && (
+                      <button
+                        onClick={() => setScheduleDoctor(member)}
+                        className="cursor-pointer rounded-lg px-2.5 py-1.5 text-xs font-medium text-muted transition-colors hover:bg-card-strong hover:text-heading"
+                      >
+                        Schedule
+                      </button>
+                    )}
                     <button
-                      onClick={() => setScheduleDoctor(member)}
-                      className="mr-4 cursor-pointer text-sm font-medium text-body hover:text-heading"
+                      onClick={() =>
+                        setConfirmAction({ type: "resetPassword", member })
+                      }
+                      className="cursor-pointer rounded-lg px-2.5 py-1.5 text-xs font-medium text-muted transition-colors hover:bg-card-strong hover:text-heading"
                     >
-                      Schedule
+                      {resetSentFor === member.uid ? "Sent" : "Reset password"}
                     </button>
-                  )}
-                  <button
-                    onClick={() =>
-                      setConfirmAction({ type: "resetPassword", member })
-                    }
-                    className="mr-4 cursor-pointer text-sm font-medium text-body hover:text-heading"
-                  >
-                    {resetSentFor === member.uid
-                      ? "Reset email sent"
-                      : "Reset password"}
-                  </button>
-                  <button
-                    onClick={() =>
-                      setConfirmAction({
-                        type: member.status === "active" ? "deactivate" : "reactivate",
-                        member,
-                      })
-                    }
-                    className="cursor-pointer text-sm font-medium text-body hover:text-heading"
-                  >
-                    {member.status === "active" ? "Deactivate" : "Reactivate"}
-                  </button>
+                    <button
+                      onClick={() =>
+                        setConfirmAction({
+                          type: member.status === "active" ? "deactivate" : "reactivate",
+                          member,
+                        })
+                      }
+                      className={`cursor-pointer rounded-lg px-2.5 py-1.5 text-xs font-medium transition-colors ${
+                        member.status === "active"
+                          ? "text-red-500 hover:bg-red-500/10 hover:text-red-600 dark:hover:text-red-400"
+                          : "text-emerald-600 hover:bg-emerald-500/10 dark:text-emerald-400"
+                      }`}
+                    >
+                      {member.status === "active" ? "Deactivate" : "Reactivate"}
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}
             {visibleStaff.length === 0 && (
               <tr>
-                <td colSpan={5} className="px-4 py-8 text-center text-faint">
-                  {showInactive ? "No staff members." : "No active staff."}
+                <td colSpan={5} className="px-5 py-16 text-center">
+                  <div className="flex flex-col items-center">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-card-strong">
+                      <NavIcon name="staff" className="h-6 w-6 text-faint" />
+                    </div>
+                    <p className="mt-3 text-sm font-medium text-muted">
+                      {showInactive ? "No staff members." : "No active staff."}
+                    </p>
+                  </div>
                 </td>
               </tr>
             )}
