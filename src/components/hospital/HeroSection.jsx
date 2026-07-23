@@ -36,47 +36,59 @@ function HeroSection({ config, doctorCount, onBookClick, onStatusClick }) {
     <section
       className="relative overflow-hidden pt-16 pb-24 md:pt-24 md:pb-32"
       style={{
-        backgroundImage: bgImage ? `url(${bgImage})` : undefined,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundColor: bgImage ? undefined : 'var(--tenant-secondary, #0f172a)',
+        backgroundColor: 'var(--tenant-secondary, #0f172a)',
       }}
     >
-      {/* Always-on gradient wash: keeps hero text readable over any photo,
-          and gives hospitals with no configured image a designed look
-          instead of a flat color fill. */}
+      {/* Background image with slow Ken Burns zoom — adds cinematic depth
+          to any hospital photo. */}
+      {bgImage && (
+        <div
+          className="hero-bg-zoom absolute inset-0"
+          aria-hidden="true"
+          style={{
+            backgroundImage: `url(${bgImage})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+          }}
+        />
+      )}
+      {/* Gradient wash over the image: brand-tinted top-left glow for
+          hospitals with a photo, radial accent for those without. */}
       <div
         className="absolute inset-0"
         style={{
           background: bgImage
-            ? 'linear-gradient(180deg, rgba(0,0,0,0.55), rgba(0,0,0,0.75))'
+            ? 'linear-gradient(180deg, rgba(0,0,0,0.45), rgba(0,0,0,0.7)), radial-gradient(ellipse 70% 50% at 15% 10%, color-mix(in srgb, var(--tenant-primary) 30%, transparent), transparent 70%)'
             : `radial-gradient(ellipse 80% 60% at 20% 0%, color-mix(in srgb, var(--tenant-primary) 28%, transparent), transparent), linear-gradient(180deg, transparent, rgba(0,0,0,0.35))`,
         }}
       />
-      {/* Bottom fade overlay — blends the hero image into the next section
-          by painting a gradient from transparent to the hero's dark base. */}
+      {/* Bottom fade overlay — blends the hero image into the next section. */}
       {bgImage && (
         <div
-          className="absolute inset-x-0 bottom-0 h-1/3"
+          className="absolute inset-x-0 bottom-0 h-2/5"
           aria-hidden="true"
           style={{
-            background: 'linear-gradient(to top, var(--tenant-secondary, #0f172a), transparent)',
+            background: 'linear-gradient(to top, var(--tenant-secondary, #0f172a) 0%, rgba(15,23,42,0.8) 40%, transparent 100%)',
           }}
         />
       )}
-      {/* Soft decorative glow, purely a wide-screen accent — echoes the
-          same blurred-blob treatment used in the staff dashboard shell so
-          the whole product feels like one design system. */}
+      {/* Top-right decorative glow — pulsing blob for visual depth. */}
       <div
-        className="pointer-events-none absolute -top-24 -right-24 hidden h-96 w-96 rounded-full opacity-20 blur-3xl md:block"
+        className="hero-glow-pulse pointer-events-none absolute -top-24 -right-24 hidden h-96 w-96 rounded-full blur-3xl md:block"
         style={{ background: 'radial-gradient(circle, var(--tenant-primary), transparent 70%)' }}
+        aria-hidden="true"
+      />
+      {/* Bottom-left decorative glow — balances the composition. */}
+      <div
+        className="hero-glow-pulse pointer-events-none absolute -bottom-32 -left-32 hidden h-[28rem] w-[28rem] rounded-full blur-3xl md:block"
+        style={{ background: 'radial-gradient(circle, var(--tenant-primary), transparent 70%)', animationDelay: '2.5s' }}
         aria-hidden="true"
       />
 
       <div className={`relative grid items-center gap-12 lg:grid-cols-[1.15fr_0.85fr] ${SITE_CONTAINER}`}>
         <div className="max-w-2xl text-white">
           {trustParts.length > 0 && (
-            <p className="animate-fade-in-up inline-flex flex-wrap items-center gap-x-3 gap-y-1 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-xs font-medium text-white backdrop-blur">
+            <p className="hero-trust-shine animate-fade-in-up inline-flex flex-wrap items-center gap-x-3 gap-y-1 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-xs font-medium text-white backdrop-blur">
               {trustParts.map((part) => (
                 <span key={part}>{part}</span>
               ))}
@@ -127,7 +139,7 @@ function HeroSection({ config, doctorCount, onBookClick, onStatusClick }) {
 
         {panelStats.length > 0 && (
           <div
-            className="animate-fade-in-up relative hidden rounded-2xl border border-white/15 bg-white/[0.07] p-6 shadow-2xl shadow-black/20 backdrop-blur-xl lg:block"
+            className="animate-fade-in-up relative hidden rounded-2xl border border-white/15 bg-white/[0.07] p-6 shadow-2xl shadow-black/20 backdrop-blur-xl transition-all duration-500 hover:border-white/25 hover:bg-white/[0.10] lg:block"
             style={{ animationDelay: '360ms' }}
           >
             <p className="text-xs font-semibold uppercase tracking-widest text-white/60">{title}, at a glance</p>
