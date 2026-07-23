@@ -1,45 +1,54 @@
-import { useMemo } from 'react'
+import { lazy, Suspense, useMemo } from 'react'
 import { Routes, Route, Navigate, Outlet, useLocation } from 'react-router-dom'
 import { getTenantSlug } from './utils/subdomain'
+import { PageSpinner } from './components/common/Spinner'
+// Public, SEO-relevant pages stay eager — they need to paint immediately
+// for both visitors and crawlers, with no extra chunk round-trip.
 import CompanyLandingPage from './pages/CompanyLandingPage'
 import HospitalLandingPage from './pages/HospitalLandingPage'
+import PublicAppointmentPage from './pages/PublicAppointmentPage'
+import AppointmentStatusPage from './pages/AppointmentStatusPage'
+import DoctorProfilePage from './pages/DoctorProfilePage'
 import { AuthProvider } from './contexts/AuthContext'
 import { FeatureProvider } from './contexts/FeatureContext'
 import { HospitalDataProvider } from './contexts/HospitalDataContext'
 import RequireFeature from './components/hospitalAdmin/RequireFeature'
-import ChatbotPage from './pages/hospitalAdmin/ChatbotPage'
 import RequireSuperAdmin from './components/superadmin/RequireSuperAdmin'
-import SuperAdminLayout from './components/superadmin/SuperAdminLayout'
-import SuperAdminLoginPage from './pages/superadmin/SuperAdminLoginPage'
-import DashboardPage from './pages/superadmin/DashboardPage'
-import HospitalsListPage from './pages/superadmin/HospitalsListPage'
-import HospitalFormPage from './pages/superadmin/HospitalFormPage'
-import HospitalDetailPage from './pages/superadmin/HospitalDetailPage'
-import StaffProfilePage from './pages/superadmin/StaffProfilePage'
-import PublicAppointmentPage from './pages/PublicAppointmentPage'
-import AppointmentStatusPage from './pages/AppointmentStatusPage'
 import RequireHospitalStaff from './components/hospitalAdmin/RequireHospitalStaff'
 import RequireRole from './components/hospitalAdmin/RequireRole'
 import RequirePermission from './components/hospitalAdmin/RequirePermission'
-import HospitalPortalLayout from './components/hospitalAdmin/HospitalPortalLayout'
-import HospitalLoginPage from './pages/hospitalAdmin/HospitalLoginPage'
-import OverviewPage from './pages/hospitalAdmin/OverviewPage'
-import AppointmentsPage from './pages/hospitalAdmin/AppointmentsPage'
-import PatientsPage from './pages/hospitalAdmin/PatientsPage'
-import StaffPage from './pages/hospitalAdmin/StaffPage'
-import DoctorsPage from './pages/hospitalAdmin/DoctorsPage'
-import MySchedulePage from './pages/hospitalAdmin/MySchedulePage'
-import DoctorProfilePage from './pages/DoctorProfilePage'
-import DoctorProfileEditor from './pages/hospitalAdmin/DoctorProfileEditor'
-import BillingPage from './pages/hospitalAdmin/BillingPage'
-import PrescriptionsPage from './pages/hospitalAdmin/PrescriptionsPage'
 import { ROLES } from './utils/roles'
+
+// Everything below is behind a login (superadmin or hospital staff) — never
+// crawled, never needed on first paint for a public visitor, so it's split
+// into its own chunk(s) that only download once someone actually navigates
+// there instead of bloating the bundle every public page has to load.
+const SuperAdminLayout = lazy(() => import('./components/superadmin/SuperAdminLayout'))
+const SuperAdminLoginPage = lazy(() => import('./pages/superadmin/SuperAdminLoginPage'))
+const DashboardPage = lazy(() => import('./pages/superadmin/DashboardPage'))
+const HospitalsListPage = lazy(() => import('./pages/superadmin/HospitalsListPage'))
+const HospitalFormPage = lazy(() => import('./pages/superadmin/HospitalFormPage'))
+const HospitalDetailPage = lazy(() => import('./pages/superadmin/HospitalDetailPage'))
+const StaffProfilePage = lazy(() => import('./pages/superadmin/StaffProfilePage'))
+const HospitalPortalLayout = lazy(() => import('./components/hospitalAdmin/HospitalPortalLayout'))
+const HospitalLoginPage = lazy(() => import('./pages/hospitalAdmin/HospitalLoginPage'))
+const OverviewPage = lazy(() => import('./pages/hospitalAdmin/OverviewPage'))
+const AppointmentsPage = lazy(() => import('./pages/hospitalAdmin/AppointmentsPage'))
+const PatientsPage = lazy(() => import('./pages/hospitalAdmin/PatientsPage'))
+const StaffPage = lazy(() => import('./pages/hospitalAdmin/StaffPage'))
+const DoctorsPage = lazy(() => import('./pages/hospitalAdmin/DoctorsPage'))
+const MySchedulePage = lazy(() => import('./pages/hospitalAdmin/MySchedulePage'))
+const DoctorProfileEditor = lazy(() => import('./pages/hospitalAdmin/DoctorProfileEditor'))
+const BillingPage = lazy(() => import('./pages/hospitalAdmin/BillingPage'))
+const PrescriptionsPage = lazy(() => import('./pages/hospitalAdmin/PrescriptionsPage'))
+const ChatbotPage = lazy(() => import('./pages/hospitalAdmin/ChatbotPage'))
 
 function App() {
   const tenantSlug = useMemo(() => getTenantSlug(), [])
   const location = useLocation()
 
   return (
+    <Suspense fallback={<PageSpinner />}>
     <Routes>
       <Route
         path="/"
@@ -172,6 +181,7 @@ function App() {
 
       <Route path="*" element={<Navigate to={{ pathname: '/', search: location.search }} replace />} />
     </Routes>
+    </Suspense>
   )
 }
 

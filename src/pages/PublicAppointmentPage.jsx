@@ -3,6 +3,7 @@ import LanguageSwitcher from '../components/common/LanguageSwitcher'
 import ThemeToggle from '../components/common/ThemeToggle'
 import BookAppointmentForm from '../components/hospital/BookAppointmentForm'
 import NavIcon from '../components/common/NavIcon'
+import { useSeoMeta } from '../hooks/useSeoMeta'
 
 // Standalone route for direct/shared links (e.g. an SMS to a patient) —
 // same form as the popup triggered from the landing page, just presented as
@@ -13,6 +14,11 @@ function PublicAppointmentPage({ slug }) {
   const backTo = doctorId
     ? { pathname: `/doctor/${doctorId}`, search: `?tenant=${slug}` }
     : { pathname: '/', search: `?tenant=${slug}` }
+
+  // noindex: thin, form-only content that duplicates the booking section
+  // already on the hospital's homepage — indexing both would just compete
+  // with the homepage for the same search terms.
+  useSeoMeta({ title: 'Book an Appointment', noindex: true })
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-page px-6 py-10 text-heading">

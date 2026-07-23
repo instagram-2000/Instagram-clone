@@ -3,6 +3,10 @@ import Reveal from "../components/common/Reveal";
 import ThemeToggle from "../components/common/ThemeToggle";
 import TokenChit from "../components/company/TokenChit";
 import LeadCaptureModal from "../components/company/LeadCaptureModal";
+import { useSeoMeta } from "../hooks/useSeoMeta";
+
+const SEO_DESCRIPTION =
+  "Currez gives every hospital its own branded booking site, patient self-service booking, and role-based dashboards for admins, doctors and receptionists — live in minutes.";
 
 const LEAD_MODALS = {
   demo: {
@@ -114,6 +118,19 @@ const CONTAINER = "mx-auto max-w-7xl px-6 sm:px-10 lg:px-16 xl:px-24";
 function CompanyLandingPage() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [activeModal, setActiveModal] = useState(null);
+
+  useSeoMeta({
+    title: "Currez — Hospital Appointment & Practice Management Platform",
+    description: SEO_DESCRIPTION,
+    structuredData: {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      name: "Currez",
+      url: "https://www.currez.in",
+      logo: "https://www.currez.in/currez-mark.png",
+      description: SEO_DESCRIPTION,
+    },
+  });
 
   return (
     <div className="min-h-screen bg-page font-plex text-heading">

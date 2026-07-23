@@ -3,6 +3,7 @@ import { useParams, useSearchParams, Link } from 'react-router-dom'
 import { subscribeDoctor } from '../firebase/users'
 import { subscribeHospital } from '../firebase/hospitals'
 import { useTheme } from '../contexts/ThemeContext'
+import { useSeoMeta } from '../hooks/useSeoMeta'
 import { initials } from '../utils/initials'
 import { isAvailableToday, availableDaysShortLabel, DAY_LABELS, DAYS_OF_WEEK, formatTimeLabel } from '../utils/doctorSchedule'
 import { renderMarkdown } from '../utils/renderMarkdown'
@@ -31,9 +32,29 @@ function DoctorProfilePage() {
     return subscribeHospital(doctor.hospitalId, setHospital)
   }, [doctor?.hospitalId])
 
-  useEffect(() => {
-    if (doctor?.displayName && hospital?.title) document.title = `Dr. ${doctor.displayName} — ${hospital.title}`
-  }, [doctor?.displayName, hospital?.title])
+  useSeoMeta({
+    title:
+      doctor?.displayName && hospital?.title ? `Dr. ${doctor.displayName} — ${hospital.title}` : undefined,
+    description:
+      doctor?.displayName &&
+      `Book an appointment with Dr. ${doctor.displayName}${doctor.specialization ? `, ${doctor.specialization}` : ''}${
+        hospital?.title ? ` at ${hospital.title}` : ''
+      }.`,
+    structuredData:
+      doctor?.displayName && hospital?.title
+        ? {
+            '@context': 'https://schema.org',
+            '@type': 'Physician',
+            name: `Dr. ${doctor.displayName}`,
+            ...(doctor.specialization && { medicalSpecialty: doctor.specialization }),
+            url: window.location.href,
+            worksFor: {
+              '@type': 'Hospital',
+              name: hospital.title,
+            },
+          }
+        : undefined,
+  })
 
   if (doctor === undefined || hospital === undefined) return <Spinner />
   if (!doctor || doctor.role !== 'DOCTOR' || doctor.status !== 'active') {

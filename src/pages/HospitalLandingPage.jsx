@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { subscribeHospital } from '../firebase/hospitals'
 import { subscribeActiveDoctors } from '../firebase/users'
 import { useTheme } from '../contexts/ThemeContext'
+import { useSeoMeta } from '../hooks/useSeoMeta'
 import Spinner from '../components/common/Spinner'
 import TenantNotFound from './TenantNotFound'
 import EmergencyBar from '../components/hospital/EmergencyBar'
@@ -31,9 +32,27 @@ function HospitalLandingPage({ slug }) {
   useEffect(() => subscribeHospital(slug, setConfig), [slug])
   useEffect(() => subscribeActiveDoctors(slug, setDoctors), [slug])
 
-  useEffect(() => {
-    if (config?.title) document.title = config.title
-  }, [config?.title])
+  const departmentNames = config?.optionals?.departments?.items?.map((d) => d.name).filter(Boolean) || []
+
+  useSeoMeta({
+    title: config?.title ? `${config.title} — Book an Appointment` : undefined,
+    description:
+      config?.hero?.subtitle ||
+      (config?.title ? `Book an appointment online at ${config.title}. Quality healthcare, trusted specialists.` : undefined),
+    image: config?.branding?.logos?.smallLogo,
+    structuredData: config?.title
+      ? {
+          '@context': 'https://schema.org',
+          '@type': 'Hospital',
+          name: config.title,
+          url: window.location.origin,
+          ...(config.branding?.logos?.smallLogo && { image: config.branding.logos.smallLogo }),
+          ...(config.footer?.phone && { telephone: config.footer.phone }),
+          ...(config.footer?.address && { address: config.footer.address }),
+          ...(departmentNames.length > 0 && { medicalSpecialty: departmentNames }),
+        }
+      : undefined,
+  })
 
   if (config === undefined) return <Spinner />
   if (!config) return <TenantNotFound slug={slug} />
