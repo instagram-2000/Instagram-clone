@@ -13,6 +13,7 @@ function BedStatsPanel({
   onBedSelect,
 }) {
   const [modalStatus, setModalStatus] = useState(null)
+  const [modalSearch, setModalSearch] = useState('')
 
   const selectedFloor = floors?.find((f) => f.id === selectedFloorId)
 
@@ -37,9 +38,23 @@ function BedStatsPanel({
       })
     : []
 
+  const searchedBeds = modalSearch.trim()
+    ? modalBeds.filter((b) => {
+        const q = modalSearch.toLowerCase()
+        const admission = findAdmission(b)
+        if (admission?.patientName?.toLowerCase().includes(q)) return true
+        if (b.bedId?.toLowerCase().includes(q)) return true
+        if (b.floorName?.toLowerCase().includes(q)) return true
+        if (b.wardName?.toLowerCase().includes(q)) return true
+        if (b.roomName?.toLowerCase().includes(q)) return true
+        return false
+      })
+    : modalBeds
+
   function handleBedClick(bed) {
     const admission = findAdmission(bed)
     setModalStatus(null)
+    setModalSearch('')
     onBedSelect?.(bed, admission)
   }
 
@@ -168,21 +183,31 @@ function BedStatsPanel({
       </div>
 
       {modalStatus && (
-        <Modal onClose={() => setModalStatus(null)} className="max-w-lg">
+        <Modal onClose={() => { setModalStatus(null); setModalSearch('') }} className="max-w-lg">
           <h2 className="mb-1 text-lg font-bold text-heading">
             {modalStatus === 'occupied' ? 'Occupied Beds' : 'Vacant Beds'}
           </h2>
-          <p className="mb-4 text-xs text-muted">
+          <p className="mb-3 text-xs text-muted">
             {modalBeds.length} bed{modalBeds.length !== 1 ? 's' : ''} &middot; Click a bed to {modalStatus === 'occupied' ? 'discharge' : 'admit'}
           </p>
+
+          <input
+            type="text"
+            value={modalSearch}
+            onChange={(e) => setModalSearch(e.target.value)}
+            placeholder={modalStatus === 'occupied' ? 'Search by patient name...' : 'Search by bed ID, ward, room...'}
+            className="mb-3 w-full rounded-xl border border-line bg-card px-3.5 py-2.5 text-sm text-heading placeholder-faint outline-none transition-colors focus:border-indigo-500/50 focus:ring-2 focus:ring-indigo-500/10"
+          />
 
           {modalBeds.length === 0 ? (
             <p className="py-8 text-center text-sm text-muted">
               {modalStatus === 'occupied' ? 'No beds are currently occupied.' : 'No vacant beds available.'}
             </p>
+          ) : searchedBeds.length === 0 ? (
+            <p className="py-8 text-center text-sm text-muted">No beds match your search.</p>
           ) : (
-            <div className="flex flex-col gap-1.5 max-h-[60vh] overflow-y-auto">
-              {modalBeds.map((bed) => {
+            <div className="flex flex-col gap-1.5 max-h-[55vh] overflow-y-auto">
+              {searchedBeds.map((bed) => {
                 const admission = findAdmission(bed)
                 const isOccupied = !!admission
                 return (
