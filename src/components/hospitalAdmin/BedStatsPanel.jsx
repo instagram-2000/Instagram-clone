@@ -49,6 +49,16 @@ function BedStatsPanel({
         <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-faint">Occupancy</h3>
         <div className="grid grid-cols-2 gap-2">
           <StatCard
+            label="Total"
+            value={stats.total}
+            color="text-heading"
+          />
+          <StatCard
+            label="Rate"
+            value={`${stats.occupancyRate}%`}
+            color="text-indigo-600 dark:text-indigo-300"
+          />
+          <StatCard
             label="Occupied"
             value={stats.occupied}
             color="text-red-600 dark:text-red-400"
@@ -60,9 +70,6 @@ function BedStatsPanel({
             color="text-emerald-600 dark:text-emerald-400"
             onClick={() => setModalStatus('vacant')}
           />
-        </div>
-        <div className="mt-2 text-center text-[11px] text-muted">
-          {stats.total} total &middot; {stats.occupancyRate}% occupancy
         </div>
       </div>
 
@@ -219,15 +226,23 @@ function BedStatsPanel({
 }
 
 function StatCard({ label, value, color, onClick }) {
+  if (onClick) {
+    return (
+      <button
+        type="button"
+        onClick={onClick}
+        className="cursor-pointer rounded-xl border border-line/80 bg-card p-3 text-center transition-all hover:border-indigo-500/30 hover:bg-indigo-500/5"
+      >
+        <div className={`text-lg font-bold ${color}`}>{value}</div>
+        <div className="mt-0.5 text-[10px] font-semibold uppercase tracking-wider text-faint">{label}</div>
+      </button>
+    )
+  }
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="cursor-pointer rounded-xl border border-line/80 bg-card p-3 text-center transition-all hover:border-indigo-500/30 hover:bg-indigo-500/5"
-    >
+    <div className="rounded-xl border border-line/80 bg-card p-3 text-center">
       <div className={`text-lg font-bold ${color}`}>{value}</div>
       <div className="mt-0.5 text-[10px] font-semibold uppercase tracking-wider text-faint">{label}</div>
-    </button>
+    </div>
   )
 }
 
