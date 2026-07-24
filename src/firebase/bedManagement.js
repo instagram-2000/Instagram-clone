@@ -114,7 +114,11 @@ export async function admitPatient(
     where('status', '==', 'active')
   )
   const existingSnap = await getDocs(existingQuery)
-  if (!existingSnap.empty) {
+  const conflicting = existingSnap.docs.find((d) => {
+    const data = d.data()
+    return data.floorId === floorId && data.wardId === wardId && data.roomId === roomId
+  })
+  if (conflicting) {
     throw new Error('This bed is already occupied.')
   }
 
